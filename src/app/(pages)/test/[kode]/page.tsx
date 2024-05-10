@@ -11,8 +11,9 @@ interface SelectedOption {
   name?: string;
 }
 
-export default function Home() {
+export default function TestPage({ params }: { params: { kode: string } }) {
   const { toast } = useToast();
+  const kodeEvent = params.kode;
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Array<SelectedOption>>(
@@ -73,18 +74,7 @@ export default function Home() {
     return getOptionData ? true : false;
   };
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetch("/api/event", { method: "GET" })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        // setKegiatans(data);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  useEffect(() => {}, [kodeEvent]);
 
   return (
     <>
