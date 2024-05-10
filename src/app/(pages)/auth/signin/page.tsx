@@ -47,7 +47,7 @@ export default function Signin() {
 
   return (
     <main className="h-full flex justify-center items-center p-4">
-      <div className="bg-white md:w-[50vw] md:m-16 rounded-xl flex">
+      <div className="bg-white md:m-16 rounded-xl flex shadow-2xl">
         <section className="flex flex-1 flex-col items-center justify-center w-full m-10 md:w-2/3 md:mx-16">
           <Image
             src="/schuler.id_2.png"
@@ -65,7 +65,7 @@ export default function Signin() {
                 <PiAt className="text-primary-foreground scale-150" />
               </div>
               <input
-                className="pl-16 w-full py-3 px-4 my-1 bg-secondary rounded-lg font-semibold outline-none focus:outline-primary focus:bg-secondary"
+                className="pl-16 w-full py-3 px-4 my-1 bg-accent rounded-lg font-semibold outline-none focus:outline-primary focus:bg-primary-foreground"
                 type="email"
                 name="email"
                 id="email"
@@ -89,7 +89,7 @@ export default function Signin() {
                 <PiLockKey className="text-primary-foreground scale-150" />
               </div>
               <input
-                className="pl-16 w-full py-3 px-4 rounded-lg my-1 font-semibold outline-none bg-secondary focus:outline-primary focus:bg-secondary"
+                className="pl-16 w-full py-3 px-4 rounded-lg my-1 font-semibold outline-none bg-accent focus:outline-primary focus:bg-primary-foreground"
                 type={`${isPasswordShow ? "text" : "password"}`}
                 name="password"
                 value={password}

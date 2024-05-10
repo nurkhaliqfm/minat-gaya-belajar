@@ -29,7 +29,7 @@ export async function GET(
   }
 
   return NextResponse.json(
-    { messege: "seccess", data: responseData },
+    { messege: "seccess", data: responseData.data_bundle_soal },
     { status: 200 }
   );
 }

@@ -34,7 +34,7 @@ export default function Header() {
     <></>
   ) : (
     <main className="flex justify-center ">
-      <section className="flex flex-col gap-y-8 max-w-[1440px] p-4 pb-0 w-full items-center">
+      <section className="flex flex-col gap-y-8 max-w-[1240px] p-4 pb-0 w-full items-center">
         <div className="flex flex-row justify-between w-full">
           <div className="flex gap-2 justify-center items-center">
             <Image

@@ -88,9 +88,8 @@ export default function Home() {
 
   return (
     <>
-      <Loading state={isLoading} />
       <main className="flex h-full justify-center">
-        <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1440px] p-4 ">
+        <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 ">
           <div className="grid grid-cols-2">
             <div className="col-start-1 col-span-2 flex justify-center m-4">
               <CircleProgress current={currentSoal} end={totalSoal} />

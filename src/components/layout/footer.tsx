@@ -10,11 +10,13 @@ export default function Footer() {
   return !cookies.get("name") ? (
     <></>
   ) : (
-    <div className="flex p-4 w-full justify-start items-center">
-      <span className="mr-2 text-white text-sm font-semibold">
-        Powered By :{" "}
-      </span>
-      <Image src="/Codefm.png" alt="codefm." width={60} height={60} />
-    </div>
+    <main className="flex justify-center">
+      <section className="flex gap-y-8 max-w-[1240px] p-4 w-full items-center ">
+        <span className="mr-2 text-white text-sm font-semibold">
+          Powered By :{" "}
+        </span>
+        <Image src="/Codefm.png" alt="codefm." width={60} height={60} />
+      </section>
+    </main>
   );
 }
