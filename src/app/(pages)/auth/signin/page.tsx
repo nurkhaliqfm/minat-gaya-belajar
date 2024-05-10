@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PiEyeSlash, PiEye, PiAt, PiLockKey } from "react-icons/pi";
 import { signIn } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
 
 export default function Signin() {
-  const router = useRouter();
   const { toast } = useToast();
 
   const [password, setPassword] = useState("");
@@ -31,7 +31,7 @@ export default function Signin() {
 
       if (!response?.error) {
         setIsLoading(false);
-        router.push("/");
+        window.open("/", "_self");
       } else if (!response.ok) {
         setIsLoading(false);
         toast({
@@ -46,13 +46,16 @@ export default function Signin() {
   };
 
   return (
-    <main className="h-full bg-slate-100 flex justify-center items-center p-4">
-      <div className="bg-primary-color md:w-[50vw] min-h-[60vh] md:m-16 rounded-xl flex">
+    <main className="h-full flex justify-center items-center p-4">
+      <div className="bg-white md:w-[50vw] md:m-16 rounded-xl flex">
         <section className="flex flex-1 flex-col items-center justify-center w-full m-10 md:w-2/3 md:mx-16">
-          <h3 className="font-bold text-4xl">Admin</h3>
-          <h3 className="font-bold mt-4 mb-6 text-lg ">
-            Aplikasi <span className="text-primary">SCHULER.ID</span>
-          </h3>
+          <Image
+            src="/schuler.id_2.png"
+            alt="schuler.id"
+            width={160}
+            height={160}
+            className="mt-4 mb-6"
+          />
           <div className="flex flex-col my-2">
             <label htmlFor="email" className="text-xs text-primary font-medium">
               Alamat Email

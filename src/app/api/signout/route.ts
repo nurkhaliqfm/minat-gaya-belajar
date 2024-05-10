@@ -15,6 +15,8 @@ export async function DELETE() {
     },
   }).then((res) => {
     if (res.status === 200) {
+      cookies().delete("name");
+      cookies().delete("role");
       cookies().delete("access_token_oauth0");
       cookies().delete("access_token_oauth0_expired");
     } else {
