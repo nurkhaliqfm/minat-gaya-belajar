@@ -5,11 +5,15 @@ import { NextResponse } from "next/server";
 
 const { NEXT_PUBLIC_API_URL } = process.env;
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: { event_id: string } }
+) {
   const currentAccessToken = cookies().get("access_token_oauth0");
+  const eventId = params.event_id;
   const response = await axios({
     method: "GET",
-    url: NEXT_PUBLIC_API_URL + "/events",
+    url: NEXT_PUBLIC_API_URL + "/events/result/" + eventId,
     headers: {
       Authorization: `Bearer ${currentAccessToken?.value}`,
     },
@@ -26,26 +30,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     { messege: "seccess", data: responseData.data },
-    { status: 200 }
-  );
-}
-
-export async function POST(request: Request) {
-  const currentAccessToken = cookies().get("access_token_oauth0");
-  const reqBody = await request.json();
-
-  const response = await axios({
-    method: "POST",
-    url: NEXT_PUBLIC_API_URL + "/events/event-history",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${currentAccessToken?.value}`,
-    },
-    data: reqBody,
-  });
-
-  return NextResponse.json(
-    { messege: "seccess", data: response.data },
     { status: 200 }
   );
 }
