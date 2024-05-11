@@ -4,82 +4,43 @@ import CircleProgress from "@/components/customs/circle-progress";
 import Loading from "@/components/customs/loading";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface SelectedOption {
+interface EventsProps {
   id?: number;
   name?: string;
+  id_type?: number;
+  ref_school?: {
+    name?: string;
+  };
 }
 
 export default function Home() {
-  const { toast } = useToast();
-
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<Array<SelectedOption>>(
-    []
-  );
+  const [events, setEvents] = useState<Array<EventsProps>>([]);
 
-  const currentSoal = 1;
-  const totalSoal = 10;
-
-  const dataSoal = {
-    question:
-      "Pilihlah maksimal 3 diantara 8 yang paling mencerminkan diri kamu ?",
-    bundle_options: [
-      { id: 1, name: "Suka Bercerita" },
-      { id: 2, name: "Sangat menyukai matematika" },
-      {
-        id: 3,
-        name: "Suka melihat peta dari pada petunjuk tertulis mengenai letak suatu tempat",
-      },
-      { id: 4, name: "Menyukai olah raga senam" },
-      { id: 5, name: "Memiliki minat yang besar dalam dunia musik" },
-      { id: 6, name: "Bergaul dengan baik" },
-      { id: 7, name: "Lebih memilih bekerja sendiri" },
-      { id: 8, name: "Memperhatikan orang-orang sekitar" },
-    ],
+  const listAssets: any = {
+    "Test Peminatan": {
+      img: "PEMINATAN.svg",
+      url: "/peminatan",
+    },
+    "Test Gaya Belajar": {
+      img: "GAYA-BELAJAR.svg",
+      url: "/gaya-belajar",
+    },
   };
 
-  const handleOptionOnClick = (value: number) => {
-    const getOptionData = dataSoal.bundle_options.find(
-      (option) => option.id === value
-    );
-
-    const cekOptionSelectedIndex = selectedOption.findIndex(
-      (option) => option.id === value
-    );
-
-    if (cekOptionSelectedIndex >= 0) {
-      let newSelectedOption = [...selectedOption];
-      newSelectedOption.splice(cekOptionSelectedIndex, 1);
-
-      setSelectedOption(newSelectedOption);
-    } else {
-      if (selectedOption.length <= 2 && getOptionData) {
-        setSelectedOption((prevState) => [...prevState, getOptionData]);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Gagal Memilih",
-          description: "Anda hanya dapat memilih maksimal 3",
-        });
-      }
-    }
-  };
-
-  const checkSelectedOption = (value: number) => {
-    const getOptionData = selectedOption.find((option) => option.id === value);
-
-    return getOptionData ? true : false;
-  };
+  const handleOptionOnClick = (value: number) => {};
 
   useEffect(() => {
     setIsLoading(true);
     fetch("/api/event", { method: "GET" })
       .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        // setKegiatans(data);
+      .then((res) => {
+        setEvents(res.data);
       })
       .finally(() => {
         setIsLoading(false);
@@ -89,30 +50,29 @@ export default function Home() {
   return (
     <>
       <main className="flex h-full justify-center">
-        <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 ">
-          <div className="grid grid-cols-2">
-            <div className="col-start-1 col-span-2 flex justify-center m-4">
-              <CircleProgress current={currentSoal} end={totalSoal} />
-            </div>
-            <div className="col-start-1 col-span-2 ">
-              <h5 className="text-sm">
-                Pertanyaan {currentSoal} dari {totalSoal}
-              </h5>
-              <h3 className="text-lg font-semibold my-2 leading-5">
-                {dataSoal.question}
-              </h3>
-            </div>
-            {dataSoal.bundle_options.map((item, index) => {
+        <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 md:p-10">
+          <div className="flex flex-col md:flex-row gap-4">
+            {events.map((item, index) => {
               return (
                 <div
                   key={index}
                   className={cn(
-                    "cursor-pointer col-span-2 border-2 border-slate-100 my-2 px-4 py-2 rounded-lg font-medium hover:font-semibold hover:bg-primary hover:text-white hover:animate-pulse transition-all",
-                    checkSelectedOption(item.id) ? "bg-blue-800 text-white" : ""
+                    "cursor-pointer shadow-md my-2 px-4 py-2 rounded-xl font-medium flex flex-col items-center hover:border-2 hover:border-primary"
                   )}
-                  onClick={() => handleOptionOnClick(item.id)}
+                  onClick={() =>
+                    router.push(listAssets[item.name!].url + "/" + item.id)
+                  }
                 >
-                  {item.name}
+                  <div className="rounded-xl overflow-hidden mt-4">
+                    <Image
+                      src={"/img/" + listAssets[item.name!].img}
+                      alt={item.name ?? ""}
+                      width={120}
+                      height={120}
+                    />
+                  </div>
+
+                  <span className="my-2">{item.name}</span>
                 </div>
               );
             })}

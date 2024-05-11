@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(
-    { messege: "seccess", data: responseData },
+    { messege: "seccess", data: responseData.data },
     { status: 200 }
   );
 }

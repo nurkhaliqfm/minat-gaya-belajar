@@ -49,16 +49,36 @@ export default function TestPage({ params }: { params: { kode: string } }) {
       );
 
       const cekOptionSelectedIndex = selectedOption.findIndex(
+        (item) => item.id === option && item.id_soal === soal
+      );
+
+      const currentOptionSelected = selectedOption.filter(
         (item) => item.id_soal === soal
       );
 
-      if (cekOptionSelectedIndex >= 0 && getOptionData) {
+      if (cekOptionSelectedIndex >= 0) {
         let newSelectedOption = [...selectedOption];
         newSelectedOption.splice(cekOptionSelectedIndex, 1);
-        newSelectedOption.push(getOptionData);
+
         setSelectedOption(newSelectedOption);
-      } else if (getOptionData) {
-        setSelectedOption((prevState) => [...prevState, getOptionData]);
+        const optionsHistory = JSON.stringify(newSelectedOption);
+        localStorage.setItem(`peminatan-history-${kodeEvent}`, optionsHistory);
+      } else {
+        if (currentOptionSelected.length <= 2 && getOptionData) {
+          setSelectedOption((prevState) => [...prevState, getOptionData]);
+          let newSelectedOption = [...selectedOption, getOptionData];
+          const optionsHistory = JSON.stringify(newSelectedOption);
+          localStorage.setItem(
+            `peminatan-history-${kodeEvent}`,
+            optionsHistory
+          );
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Gagal Memilih",
+            description: "Anda hanya dapat memilih maksimal 3",
+          });
+        }
       }
     }
   };
@@ -76,24 +96,37 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   };
 
   const handleSubmitResult = () => {
-    const visual = selectedOption.filter((item) => item.id_kode_option === 9);
-    const audio = selectedOption.filter((item) => item.id_kode_option === 10);
-    const kinestetik = selectedOption.filter(
-      (item) => item.id_kode_option === 11
-    );
+    const k1 = selectedOption.filter((item) => item.id_kode_option === 1);
+    const k2 = selectedOption.filter((item) => item.id_kode_option === 2);
+    const k3 = selectedOption.filter((item) => item.id_kode_option === 3);
+    const k4 = selectedOption.filter((item) => item.id_kode_option === 4);
+    const k5 = selectedOption.filter((item) => item.id_kode_option === 5);
+    const k6 = selectedOption.filter((item) => item.id_kode_option === 6);
+    const k7 = selectedOption.filter((item) => item.id_kode_option === 7);
+    const k8 = selectedOption.filter((item) => item.id_kode_option === 8);
 
-    console.log("Visual:", visual.length);
-    console.log("Audio:", audio.length);
-    console.log("Kinestetik:", kinestetik.length);
+    console.log("K1:", k1.length);
+    console.log("K2:", k2.length);
+    console.log("K3:", k3.length);
+    console.log("K4:", k4.length);
+    console.log("K5:", k5.length);
+    console.log("K6:", k6.length);
+    console.log("K7:", k7.length);
+    console.log("K8:", k8.length);
   };
 
   useEffect(() => {
     if (currentSoal) {
+      const latestHistoryOption: any = localStorage.getItem(
+        `peminatan-history-${kodeEvent}`
+      );
+
       fetch("/api/peminatan/bundel-soal/" + kodeEvent, { method: "GET" })
         .then((res) => res.json())
         .then((res) => {
           setBundelSoal(res.data.bundle_soal[currentSoal - 1]);
           setTotalSoals(res.data.bundle_soal.length);
+          setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
         })
         .finally(() => {
           setIsLoading(false);
@@ -106,7 +139,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
       <main className="flex h-full justify-center">
         <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 md:p-16 flex flex-col justify-center">
           {isLoading ? (
-            <div className="flex justify-center items-center flex-col h-full p-2">
+            <div className="flex justify-center items-center flex-col  h-full p-2">
               <div className=" p-6 rounded-lg flex flex-col gap-6 justify-center items-center">
                 <HashLoader color="#4245D1" />
               </div>
@@ -124,28 +157,32 @@ export default function TestPage({ params }: { params: { kode: string } }) {
                   <h3 className="text-lg font-semibold my-2 leading-5">
                     {bundelSoal?.bank_soal?.soal}
                   </h3>
-                  {bundelSoal?.bank_soal?.bundle_option &&
-                    bundelSoal?.bank_soal?.bundle_option.map((item, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className={cn(
-                            "cursor-pointer col-span-2 border-2 border-slate-100 my-2 px-4 py-2 rounded-lg font-medium hover:font-semibold hover:border-primary hover:text-primary transition-all",
-                            checkSelectedOption(item.id!, item.id_soal!)
-                              ? "bg-blue-800 text-white hover:text-white"
-                              : ""
-                          )}
-                          onClick={() =>
-                            handleOptionOnClick(item.id!, item.id_soal!)
-                          }
-                        >
-                          {item.name}
-                        </div>
-                      );
-                    })}
+                  <div className="grid grid-cols-2">
+                    {bundelSoal?.bank_soal?.bundle_option &&
+                      bundelSoal?.bank_soal?.bundle_option.map(
+                        (item, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={cn(
+                                "cursor-pointer col-span-2 md:col-span-1 border-2 border-slate-300 m-2 px-4 py-2 rounded-lg font-medium hover:font-semibold hover:border-primary hover:text-primary transition-all",
+                                checkSelectedOption(item.id!, item.id_soal!)
+                                  ? "bg-blue-800 text-white hover:text-white"
+                                  : ""
+                              )}
+                              onClick={() =>
+                                handleOptionOnClick(item.id!, item.id_soal!)
+                              }
+                            >
+                              {item.name}
+                            </div>
+                          );
+                        }
+                      )}
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-center gap-x-4 my-4 md:my-10">
+              <div className="flex justify-center gap-x-4 my-4">
                 <Button
                   onClick={() => handleChangeQuestion(currentSoal - 1)}
                   disabled={currentSoal == 1 ? true : false}

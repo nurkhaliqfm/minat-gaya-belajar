@@ -1,7 +1,6 @@
 "use client";
 
 import "@/app/globals.css";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
