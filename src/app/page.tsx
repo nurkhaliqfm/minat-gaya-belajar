@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 interface EventsProps {
   id?: number;
   name?: string;
-  id_type?: number;
+  id_kode_soal?: number;
   ref_school?: {
     name?: string;
   };
