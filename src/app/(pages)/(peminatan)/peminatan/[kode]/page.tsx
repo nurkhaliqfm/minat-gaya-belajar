@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { HashLoader } from "react-spinners";
 import { Dialog } from "@radix-ui/react-dialog";
 import AlertDialog from "./alert-dialog";
+import { useRouter } from "next/navigation";
 
 interface ItemOptionsBundle {
   id?: number;
@@ -30,6 +31,7 @@ interface BundleSoalProps {
 
 export default function TestPage({ params }: { params: { kode: string } }) {
   const { toast } = useToast();
+  const router = useRouter();
   const kodeEvent = params.kode;
   const { queryParams, setQueryParams } = useQueryParams<{
     quest_number?: string;
@@ -115,23 +117,23 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   };
 
   const handleSubmitResult = () => {
-    const k1 = selectedOption.filter((item) => item.id_kode_option === 1);
-    const k2 = selectedOption.filter((item) => item.id_kode_option === 2);
-    const k3 = selectedOption.filter((item) => item.id_kode_option === 3);
-    const k4 = selectedOption.filter((item) => item.id_kode_option === 4);
-    const k5 = selectedOption.filter((item) => item.id_kode_option === 5);
-    const k6 = selectedOption.filter((item) => item.id_kode_option === 6);
-    const k7 = selectedOption.filter((item) => item.id_kode_option === 7);
-    const k8 = selectedOption.filter((item) => item.id_kode_option === 8);
+    setIsLoading(true);
+    const reqBody = {
+      id_event: bundelSoal?.id_event,
+      selected_option: selectedOption,
+    };
 
-    console.log("K1:", k1.length);
-    console.log("K2:", k2.length);
-    console.log("K3:", k3.length);
-    console.log("K4:", k4.length);
-    console.log("K5:", k5.length);
-    console.log("K6:", k6.length);
-    console.log("K7:", k7.length);
-    console.log("K8:", k8.length);
+    fetch("/api/event", {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    }).then(async (res) => {
+      if (res.status) {
+        const responseData = await res.json();
+        localStorage.removeItem(`peminatan-history-${kodeEvent}`);
+        localStorage.removeItem(`peminatan-${kodeEvent}-status`);
+        router.push("/hasil-peminatan/" + responseData.data.event_id);
+      }
+    });
   };
 
   useEffect(() => {
