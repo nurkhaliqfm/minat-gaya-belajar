@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HashLoader } from "react-spinners";
 import AlertDialog from "./alert-dialog";
+import { useRouter } from "next/navigation";
 
 interface ItemOptionsBundle {
   id?: number;
@@ -28,7 +29,7 @@ interface BundleSoalProps {
 }
 
 export default function TestPage({ params }: { params: { kode: string } }) {
-  const { toast } = useToast();
+  const router = useRouter();
   const kodeEvent = params.kode;
   const { queryParams, setQueryParams } = useQueryParams<{
     quest_number?: string;
@@ -105,15 +106,23 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   };
 
   const handleSubmitResult = () => {
-    const visual = selectedOption.filter((item) => item.id_kode_option === 9);
-    const audio = selectedOption.filter((item) => item.id_kode_option === 10);
-    const kinestetik = selectedOption.filter(
-      (item) => item.id_kode_option === 11
-    );
+    setIsLoading(true);
+    const reqBody = {
+      id_event: bundelSoal?.id_event,
+      selected_option: selectedOption,
+    };
 
-    console.log("Visual:", visual.length);
-    console.log("Audio:", audio.length);
-    console.log("Kinestetik:", kinestetik.length);
+    fetch("/api/event", {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    }).then(async (res) => {
+      if (res.status) {
+        const responseData = await res.json();
+        localStorage.removeItem(`gaya-belajar-history-${kodeEvent}`);
+        localStorage.removeItem(`gaya-belajar-${kodeEvent}-status`);
+        router.push("/hasil-gaya-belajar/" + responseData.data.event_id);
+      }
+    });
   };
 
   useEffect(() => {
