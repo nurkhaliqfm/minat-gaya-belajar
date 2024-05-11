@@ -25,11 +25,11 @@ export default function Home() {
   const listAssets: any = {
     "Test Peminatan": {
       img: "PEMINATAN.svg",
-      url: "/peminatan",
+      slug: "peminatan",
     },
     "Test Gaya Belajar": {
       img: "GAYA-BELAJAR.svg",
-      url: "/gaya-belajar",
+      slug: "gaya-belajar",
     },
   };
 
@@ -59,9 +59,14 @@ export default function Home() {
                   className={cn(
                     "cursor-pointer shadow-md my-2 px-4 py-2 rounded-xl font-medium flex flex-col items-center hover:border-2 hover:border-primary"
                   )}
-                  onClick={() =>
-                    router.push(listAssets[item.name!].url + "/" + item.id)
-                  }
+                  onClick={() => {
+                    localStorage.removeItem(
+                      `${listAssets[item.name!].slug}-${item.id}-status`
+                    );
+                    router.push(
+                      "/" + listAssets[item.name!].slug + "/" + item.id
+                    );
+                  }}
                 >
                   <div className="rounded-xl overflow-hidden mt-4">
                     <Image
