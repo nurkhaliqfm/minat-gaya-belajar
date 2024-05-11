@@ -7,6 +7,7 @@ import useQueryParams from "@/hooks/useQueryParams";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HashLoader } from "react-spinners";
+import AlertDialog from "./alert-dialog";
 
 interface ItemOptionsBundle {
   id?: number;
@@ -36,11 +37,26 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   const currentSoal = parseInt(queryParams?.get("quest_number") || "1");
 
   const [isLoading, setIsLoading] = useState(true);
+  const [historyTestAlert, setHistoryTestAlert] = useState(false);
   const [bundelSoal, setBundelSoal] = useState<BundleSoalProps>();
   const [totalSoals, setTotalSoals] = useState<number>(currentSoal);
   const [selectedOption, setSelectedOption] = useState<
     Array<ItemOptionsBundle>
   >([]);
+
+  const handleHistoryTestAlert = (state: boolean) => {
+    if (state) {
+      const latestHistoryOption: any = localStorage.getItem(
+        `gaya-belajar-history-${kodeEvent}`
+      );
+      localStorage.setItem(`gaya-belajar-${kodeEvent}-status`, "start");
+      setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
+    } else {
+      localStorage.removeItem(`gaya-belajar-history-${kodeEvent}`);
+      localStorage.setItem(`gaya-belajar-${kodeEvent}-status`, "start");
+    }
+    setHistoryTestAlert(false);
+  };
 
   const handleOptionOnClick = (option: number, soal: number) => {
     if (bundelSoal?.bank_soal?.bundle_option) {
@@ -62,6 +78,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
           `gaya-belajar-history-${kodeEvent}`,
           optionsHistory
         );
+        localStorage.setItem(`gaya-belajar-${kodeEvent}-status`, "start");
       } else if (getOptionData) {
         setSelectedOption((prevState) => [...prevState, getOptionData]);
         let newSelectedOption = [...selectedOption, getOptionData];
@@ -70,6 +87,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
           `gaya-belajar-history-${kodeEvent}`,
           optionsHistory
         );
+        localStorage.setItem(`gaya-belajar-${kodeEvent}-status`, "start");
       }
     }
   };
@@ -100,15 +118,26 @@ export default function TestPage({ params }: { params: { kode: string } }) {
 
   useEffect(() => {
     if (currentSoal) {
+      const latestHistoryStatus: any = localStorage.getItem(
+        `gaya-belajar-${kodeEvent}-status`
+      );
+
       const latestHistoryOption: any = localStorage.getItem(
         `gaya-belajar-history-${kodeEvent}`
       );
-      fetch("/api/peminatan/bundel-soal/" + kodeEvent, { method: "GET" })
+
+      if (!latestHistoryStatus && latestHistoryOption) {
+        setHistoryTestAlert(true);
+      } else if (latestHistoryOption) {
+        setHistoryTestAlert(false);
+        setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
+      }
+
+      fetch("/api/gaya-belajar/bundel-soal/" + kodeEvent, { method: "GET" })
         .then((res) => res.json())
         .then((res) => {
           setBundelSoal(res.data.bundle_soal[currentSoal - 1]);
           setTotalSoals(res.data.bundle_soal.length);
-          setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
         })
         .finally(() => {
           setIsLoading(false);
@@ -118,6 +147,10 @@ export default function TestPage({ params }: { params: { kode: string } }) {
 
   return (
     <>
+      <AlertDialog
+        state={historyTestAlert}
+        handleAlert={handleHistoryTestAlert}
+      />
       <main className="flex h-full justify-center">
         <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 md:p-16 flex flex-col justify-center">
           {isLoading ? (
