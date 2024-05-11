@@ -4,9 +4,11 @@ import CircleProgress from "@/components/customs/circle-progress";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import useQueryParams from "@/hooks/useQueryParams";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HashLoader } from "react-spinners";
+import { Dialog } from "@radix-ui/react-dialog";
+import AlertDialog from "./alert-dialog";
 
 interface ItemOptionsBundle {
   id?: number;
@@ -36,11 +38,26 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   const currentSoal = parseInt(queryParams?.get("quest_number") || "1");
 
   const [isLoading, setIsLoading] = useState(true);
+  const [historyTestAlert, setHistoryTestAlert] = useState(false);
   const [bundelSoal, setBundelSoal] = useState<BundleSoalProps>();
   const [totalSoals, setTotalSoals] = useState<number>(currentSoal);
   const [selectedOption, setSelectedOption] = useState<
     Array<ItemOptionsBundle>
   >([]);
+
+  const handleHistoryTestAlert = (state: boolean) => {
+    if (state) {
+      const latestHistoryOption: any = localStorage.getItem(
+        `peminatan-history-${kodeEvent}`
+      );
+      localStorage.setItem(`peminatan-${kodeEvent}-status`, "start");
+      setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
+    } else {
+      localStorage.removeItem(`peminatan-history-${kodeEvent}`);
+      localStorage.setItem(`peminatan-${kodeEvent}-status`, "start");
+    }
+    setHistoryTestAlert(false);
+  };
 
   const handleOptionOnClick = (option: number, soal: number) => {
     if (bundelSoal?.bank_soal?.bundle_option) {
@@ -63,6 +80,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
         setSelectedOption(newSelectedOption);
         const optionsHistory = JSON.stringify(newSelectedOption);
         localStorage.setItem(`peminatan-history-${kodeEvent}`, optionsHistory);
+        localStorage.setItem(`peminatan-${kodeEvent}-status`, "start");
       } else {
         if (currentOptionSelected.length <= 2 && getOptionData) {
           setSelectedOption((prevState) => [...prevState, getOptionData]);
@@ -72,6 +90,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
             `peminatan-history-${kodeEvent}`,
             optionsHistory
           );
+          localStorage.setItem(`peminatan-${kodeEvent}-status`, "start");
         } else {
           toast({
             variant: "destructive",
@@ -117,25 +136,39 @@ export default function TestPage({ params }: { params: { kode: string } }) {
 
   useEffect(() => {
     if (currentSoal) {
+      const latestHistoryStatus: any = localStorage.getItem(
+        `peminatan-${kodeEvent}-status`
+      );
+
       const latestHistoryOption: any = localStorage.getItem(
         `peminatan-history-${kodeEvent}`
       );
+
+      if (!latestHistoryStatus && latestHistoryOption) {
+        setHistoryTestAlert(true);
+      } else if (latestHistoryOption) {
+        setHistoryTestAlert(false);
+        setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
+      }
 
       fetch("/api/peminatan/bundel-soal/" + kodeEvent, { method: "GET" })
         .then((res) => res.json())
         .then((res) => {
           setBundelSoal(res.data.bundle_soal[currentSoal - 1]);
           setTotalSoals(res.data.bundle_soal.length);
-          setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
         })
         .finally(() => {
           setIsLoading(false);
         });
     }
-  }, [kodeEvent, currentSoal]);
+  }, [kodeEvent, currentSoal, historyTestAlert]);
 
   return (
     <>
+      <AlertDialog
+        state={historyTestAlert}
+        handleAlert={handleHistoryTestAlert}
+      />
       <main className="flex h-full justify-center">
         <section className="w-full bg-white h-full rounded-2xl shadow-lg max-w-[1200px] p-4 md:p-16 flex flex-col justify-center">
           {isLoading ? (
