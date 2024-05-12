@@ -60,7 +60,7 @@ export default function HasilEventPeminatan({
           ) : (
             <>
               <h3 className="text-2xl md:text-3xl font-semibold text-center my-2">
-                Hasil Test Peminatan
+                Hasil Test Minat & Bakat
               </h3>
               <p className="text-center my-2 mb-4">
                 Dari hasil test anda kami menemukan hasil berikut

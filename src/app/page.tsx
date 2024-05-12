@@ -23,7 +23,7 @@ export default function Home() {
   const [events, setEvents] = useState<Array<EventsProps>>([]);
 
   const listAssets: any = {
-    "Test Peminatan": {
+    "Test Minat & Bakat": {
       img: "PEMINATAN.svg",
       slug: "peminatan",
     },
