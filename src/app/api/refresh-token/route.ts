@@ -16,6 +16,8 @@ export async function GET(request: Request) {
     },
   });
 
+  console.log("this is The Response", response);
+
   if (response.status === 200) {
     cookies().set("access_token_oauth0", response.data.access_token);
     cookies().set("access_token_oauth0_expired", response.data.expires_in);
