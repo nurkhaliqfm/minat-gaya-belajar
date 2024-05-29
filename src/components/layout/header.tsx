@@ -42,6 +42,8 @@ export default function Header() {
               alt="schuler.id"
               width={120}
               height={120}
+              onClick={() => router.push("/")}
+              className="cursor-pointer"
             />
           </div>
           <DropdownMenu>
