@@ -34,6 +34,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   const { queryParams, setQueryParams } = useQueryParams<{
     quest_number?: string;
   }>();
+  const { toast } = useToast();
 
   const currentSoal = parseInt(queryParams?.get("quest_number") || "1");
 
@@ -101,8 +102,20 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   };
 
   const handleChangeQuestion = (currentQuest: number) => {
-    setIsLoading(true);
-    setQueryParams({ quest_number: `${currentQuest}` });
+    const getOptionData = selectedOption.find(
+      (item) => item.id_soal === bundelSoal?.id
+    );
+
+    if (getOptionData || currentSoal > currentQuest) {
+      setIsLoading(true);
+      setQueryParams({ quest_number: `${currentQuest}` });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Gagal Melanjutkan",
+        description: "Pastikan Memilih Sebelum Melanjutkan",
+      });
+    }
   };
 
   const handleSubmitResult = () => {
