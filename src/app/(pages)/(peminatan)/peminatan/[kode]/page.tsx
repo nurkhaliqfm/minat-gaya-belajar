@@ -84,7 +84,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
         localStorage.setItem(`peminatan-history-${kodeEvent}`, optionsHistory);
         localStorage.setItem(`peminatan-${kodeEvent}-status`, "start");
       } else {
-        if (currentOptionSelected.length <= 2 && getOptionData) {
+        if (currentOptionSelected.length <= 1 && getOptionData) {
           setSelectedOption((prevState) => [...prevState, getOptionData]);
           let newSelectedOption = [...selectedOption, getOptionData];
           const optionsHistory = JSON.stringify(newSelectedOption);
@@ -97,7 +97,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
           toast({
             variant: "destructive",
             title: "Gagal Memilih",
-            description: "Anda hanya dapat memilih maksimal 3",
+            description: "Anda hanya dapat memilih maksimal 2",
           });
         }
       }
