@@ -1,0 +1,8 @@
+NEXT_PUBLIC_API_URL=https://apps.schuler.id:3021
+
+OAUTH0_CLIENT_SECRET=l7lpfrhiUVpfwGn1dvikx2vxMJG/23tlK2zCkJ4D32U=
+OAUTH0_CLIENT_ID=2
+OAUTH0_GRANT_TYPE=password
+
+NEXTAUTH_SECRET=l7lpfrhiUVpfwGn1dvikx2vxMJG/23tlK2zCkJ4D32U=
+NEXTAUTH_URL=https://apps.schuler.id
