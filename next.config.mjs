@@ -1,4 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = { reactStrictMode: false };
+const nextConfig = { trailingSlash: true, reactStrictMode: false };
 
 export default nextConfig;
