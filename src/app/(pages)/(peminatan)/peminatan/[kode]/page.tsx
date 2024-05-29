@@ -40,6 +40,8 @@ export default function TestPage({ params }: { params: { kode: string } }) {
   const currentSoal = parseInt(queryParams?.get("quest_number") || "1");
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [historyDataEventId, setHistoryDataEventId] = useState<number>(0);
   const [historyTestAlert, setHistoryTestAlert] = useState(false);
   const [bundelSoal, setBundelSoal] = useState<BundleSoalProps>();
   const [totalSoals, setTotalSoals] = useState<number>(currentSoal);
@@ -113,7 +115,7 @@ export default function TestPage({ params }: { params: { kode: string } }) {
 
   const handleChangeQuestion = (currentQuest: number) => {
     const getOptionData = selectedOption.find(
-      (item) => item.id_soal === bundelSoal?.id
+      (item) => item.id_soal === bundelSoal?.bank_soal?.id
     );
 
     if (getOptionData || currentSoal > currentQuest) {
@@ -150,32 +152,47 @@ export default function TestPage({ params }: { params: { kode: string } }) {
 
   useEffect(() => {
     if (currentSoal) {
-      const latestHistoryStatus: any = localStorage.getItem(
-        `peminatan-${kodeEvent}-status`
-      );
-
-      const latestHistoryOption: any = localStorage.getItem(
-        `peminatan-history-${kodeEvent}`
-      );
-
-      if (!latestHistoryStatus && latestHistoryOption) {
-        setHistoryTestAlert(true);
-      } else if (latestHistoryOption) {
-        setHistoryTestAlert(false);
-        setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
-      }
-
-      fetch("/api/peminatan/bundel-soal/" + kodeEvent, { method: "GET" })
+      fetch("/api/me/history/" + kodeEvent, { method: "GET" })
         .then((res) => res.json())
         .then((res) => {
-          setBundelSoal(res.data.bundle_soal[currentSoal - 1]);
-          setTotalSoals(res.data.bundle_soal.length);
-        })
-        .finally(() => {
-          setIsLoading(false);
+          if (res.data.length > 0) {
+            toast({
+              variant: "destructive",
+              title: "Gagal Melakukan Test",
+              description: "Anda Telah Melakukan Tes Minat & Bakat Sebelumnya",
+            });
+            setHistoryDataEventId(res.data[0].id_event);
+            setIsCompleted(true);
+            setIsLoading(false);
+          } else {
+            const latestHistoryStatus: any = localStorage.getItem(
+              `peminatan-${kodeEvent}-status`
+            );
+
+            const latestHistoryOption: any = localStorage.getItem(
+              `peminatan-history-${kodeEvent}`
+            );
+
+            if (!latestHistoryStatus && latestHistoryOption) {
+              setHistoryTestAlert(true);
+            } else if (latestHistoryOption) {
+              setHistoryTestAlert(false);
+              setSelectedOption(JSON.parse(latestHistoryOption) ?? []);
+            }
+
+            fetch("/api/peminatan/bundel-soal/" + kodeEvent, { method: "GET" })
+              .then((res) => res.json())
+              .then((res) => {
+                setBundelSoal(res.data.bundle_soal[currentSoal - 1]);
+                setTotalSoals(res.data.bundle_soal.length);
+              })
+              .finally(() => {
+                setIsLoading(false);
+              });
+          }
         });
     }
-  }, [kodeEvent, currentSoal, historyTestAlert]);
+  }, [kodeEvent, currentSoal, historyTestAlert, toast]);
 
   return (
     <>
@@ -189,6 +206,25 @@ export default function TestPage({ params }: { params: { kode: string } }) {
             <div className="flex justify-center items-center flex-col  h-full p-2">
               <div className=" p-6 rounded-lg flex flex-col gap-6 justify-center items-center">
                 <HashLoader color="#4245D1" />
+              </div>
+            </div>
+          ) : isCompleted ? (
+            <div className="flex flex-col justify-center items-center">
+              <span className="max-w-64 text-center">
+                Anda telah menyelesaikan Test Minat & Bakat Sebelumnya
+              </span>
+              <div className="flex flex-col gap-y-2 justify-center gap-x-4 my-4">
+                <Button
+                  onClick={() =>
+                    router.push("/hasil-peminatan/" + historyDataEventId)
+                  }
+                  variant="default"
+                >
+                  Lihat Hasil
+                </Button>
+                <Button onClick={() => router.push("/")} variant="outline">
+                  Kembali Ke Dashboard
+                </Button>
               </div>
             </div>
           ) : (
