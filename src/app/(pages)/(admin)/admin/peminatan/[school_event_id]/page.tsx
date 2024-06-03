@@ -1,12 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HashLoader } from "react-spinners";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import {
   Accordion,
@@ -14,6 +9,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+import { StudentResult, columns } from "../column";
+import { DataTable } from "../data-table";
 
 import dynamic from "next/dynamic";
 import "chart.js/auto";
@@ -25,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 const Line = dynamic(
   () => import("react-chartjs-2").then((mod) => mod.Doughnut),
@@ -33,37 +32,22 @@ const Line = dynamic(
   }
 );
 
-const data = {
-  labels: [
-    "K1 - Kecerdasan Verbal",
-    "K2 - Kecerdasan Logis",
-    "K3 - Kecerdasan Visual",
-    "K4 - Kecerdasan Kinestetik",
-    "K5 - Kecerdasan Musikal",
-    "K6 - Kecerdasan Intepersonal",
-    "K7 - Kecerdasan Intrapersonal",
-    "K8 - Kecerdasan Naturalis",
-  ],
-  datasets: [
-    {
-      label: "Test Minat & Bakat",
-      data: [20, 59, 80, 81, 56, 10, 22, 52],
-      backgroundColor: [
-        "rgb(255, 99, 132)",
-        "rgb(54, 162, 235)",
-        "rgb(255, 205, 86)",
-        "rgb(90, 10, 200)",
-        "rgb(54, 162, 235)",
-        "rgb(75, 192, 192)",
-        "rgb(153, 102, 255)",
-        "rgb(255, 159, 64)",
-      ],
-    },
-  ],
-};
+interface PropsTable {
+  no: string;
+  name: string;
+  isKuliah: string;
+  ket: string;
+  result: string;
+}
 
-export default function HasilPeminatan() {
+export default function HasilPeminatan({
+  params,
+}: {
+  params: { school_event_id: number };
+}) {
   const [isLoading, setIsLoading] = useState(false);
+  const [eventResult, setEventsResult] = useState<Array<StudentResult>>();
+  const [dataDiagram, setDataDiagram] = useState<any>(null);
   const dataCategory = [
     {
       name: "K1 - Kecerdasan Verbal",
@@ -119,18 +103,102 @@ export default function HasilPeminatan() {
       rekomendasi: "Dokter hewan, peternakan, kelautan atau kehutanan",
     },
   ];
-  const dataHasil = [
-    { name: "Taufik Syam", result: "K1 - Kecerdasan Verbal" },
-    { name: "Syamsuddin", result: "K7 - Kecerdasan Intrapersonal" },
-    { name: "Alimuddin", result: "K3 - Kecerdasan Visual" },
-    { name: "Susi Susanti", result: "K4 - Kecerdasan Kinestetik" },
-    { name: "Alfian", result: "K4 - Kecerdasan Kinestetik" },
-    { name: "Aisyah", result: "K6 - Kecerdasan Intepersonal" },
-    { name: "Nurul Awaliyah", result: "K2 - Kecerdasan Logis" },
-    { name: "Halim Gau", result: "K3 - Kecerdasan Visual" },
-    { name: "Muhammad Ali", result: "K1 - Kecerdasan Verbal" },
-    { name: "Raman Alimuddin", result: "K2 - Kecerdasan Logis" },
-  ];
+
+  useEffect(() => {
+    fetch("/api/event/result/school/" + params.school_event_id, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let newData: any = [];
+        res.data.forEach((item: any, index: number) => {
+          const content = {
+            no: `${index + 1}`,
+            name: item.users.biodata_users.full_name,
+            isKuliah:
+              item.users.biodata_users.isKuliah === 0
+                ? "Kuliah"
+                : "Tidak Ingin Kuliah",
+            ket: item.users.biodata_users.ket,
+            result: item.ref_result.name,
+          };
+          newData.push(content);
+        });
+
+        console.log(newData);
+
+        const k1 = newData.filter(
+          (item: StudentResult) => item.result === "K1 - Kecerdasan Verbal"
+        );
+        const k2 = newData.filter(
+          (item: StudentResult) => item.result === "K2 - Kecerdasan Logis"
+        );
+        const k3 = newData.filter(
+          (item: StudentResult) => item.result === "K3 - Kecerdasan Visual"
+        );
+        const k4 = newData.filter(
+          (item: StudentResult) => item.result === "K4 - Kecerdasan Kinestetik"
+        );
+        const k5 = newData.filter(
+          (item: StudentResult) => item.result === "K5 - Kecerdasan Musikal"
+        );
+        const k6 = newData.filter(
+          (item: StudentResult) =>
+            item.result === "K6 - Kecerdasan Intepersonal"
+        );
+        const k7 = newData.filter(
+          (item: StudentResult) =>
+            item.result === "K7 - Kecerdasan Intrapersonal"
+        );
+        const k8 = newData.filter(
+          (item: StudentResult) => item.result === "K8 - Kecerdasan Naturalis"
+        );
+
+        const dataDiagram = {
+          labels: [
+            "K1 - Kecerdasan Verbal",
+            "K2 - Kecerdasan Logis",
+            "K3 - Kecerdasan Visual",
+            "K4 - Kecerdasan Kinestetik",
+            "K5 - Kecerdasan Musikal",
+            "K6 - Kecerdasan Intepersonal",
+            "K7 - Kecerdasan Intrapersonal",
+            "K8 - Kecerdasan Naturalis",
+          ],
+          datasets: [
+            {
+              label: "Test Minat & Bakat",
+              data: [
+                k1.length,
+                k2.length,
+                k3.length,
+                k4.length,
+                k5.length,
+                k6.length,
+                k7.length,
+                k8.length,
+              ],
+              backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(54, 162, 235)",
+                "rgb(255, 205, 86)",
+                "rgb(90, 10, 200)",
+                "rgb(54, 162, 235)",
+                "rgb(75, 192, 192)",
+                "rgb(153, 102, 255)",
+                "rgb(255, 159, 64)",
+              ],
+            },
+          ],
+        };
+
+        setDataDiagram(dataDiagram);
+        setEventsResult(newData);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [params.school_event_id]);
 
   return (
     <>
@@ -151,51 +219,14 @@ export default function HasilPeminatan() {
                 Berikut adalah data siswa yang telah mengerjakan test minat &
                 bakat
               </p>
-
-              <div className="grid lg:grid-cols-2 grid-cols-1 gap-2 mb-4">
-                <Table className="rounded-md overflow-hidden my-5">
-                  <TableHeader className="bg-secondary">
-                    <TableRow>
-                      <TableHead className="text-white text-center">
-                        No.
-                      </TableHead>
-                      <TableHead className=" text-white text-center">
-                        Nama
-                      </TableHead>
-                      <TableHead className="text-white text-center">
-                        Hasil
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <>
-                      {dataHasil.map((item: any, index: number) => {
-                        return (
-                          <TableRow
-                            key={index}
-                            className={`${
-                              index % 2 === 1 ? "bg-slate-100" : ""
-                            }`}
-                          >
-                            <TableCell className="text-center">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {item.name}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {item.result}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </>
-                  </TableBody>
-                </Table>
-                <div className="flex justify-center items-center">
-                  {/* <div className="max-w-xl"> */}
-                  <Line data={data} />
-                  {/* </div> */}
+              {eventResult && (
+                <div className="grid grid-cols-1 gap-2 mb-4">
+                  <DataTable columns={columns} data={eventResult} />
+                </div>
+              )}
+              <div className="flex justify-center items-center">
+                <div className="lg:size-1/2 size-full">
+                  {dataDiagram !== null && <Line data={dataDiagram} />}
                 </div>
               </div>
 

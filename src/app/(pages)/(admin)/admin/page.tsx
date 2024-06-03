@@ -78,7 +78,12 @@ export default function Admin() {
                         "cursor-pointer shadow-md my-2 px-4 py-2 rounded-xl font-medium flex flex-col items-center hover:border-2 hover:border-primary"
                       )}
                       onClick={() => {
-                        router.push("/admin/" + listAssets[item.name!].slug);
+                        router.push(
+                          "/admin/" +
+                            listAssets[item.name!].slug +
+                            "/" +
+                            item.id
+                        );
                       }}
                     >
                       <div className="rounded-xl overflow-hidden mt-4">
